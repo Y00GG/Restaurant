@@ -1,7 +1,7 @@
 "use client";
 
 import { BottomContent, DynamicTable } from "@components/common";
-import TopContent2 from "@components/common/TopContent2";
+import TopContent from "@components/common/TopContent";
 import type { ISale } from "@interfaces/ISale";
 import type { IColumn } from "@interfaces/ITableState";
 import { type DateValue, parseDate } from "@internationalized/date";
@@ -95,7 +95,7 @@ const Sales = () => {
 						rowsPerPage={rowsPerPage}
 						page={page}
 						topContent={
-							<TopContent2
+							<TopContent
 								filterValue={filterValue}
 								onSearchChange={handleSearchChange}
 								onClear={handleClear}

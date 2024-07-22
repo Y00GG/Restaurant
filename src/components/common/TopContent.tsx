@@ -1,4 +1,5 @@
-import { Button, Input } from "@nextui-org/react";
+import type { DateValue } from "@internationalized/date";
+import { Button, DateRangePicker, Input } from "@nextui-org/react";
 import type React from "react";
 import { FaPlus, FaSearch } from "react-icons/fa";
 
@@ -9,7 +10,14 @@ interface TopContentProps {
 	totalMessage: string;
 	rowsPerPage: number;
 	onRowsPerPageChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+	startDate?: DateValue;
+	endDate?: DateValue;
+	onDateRangeChange?: (range: {
+		startDate: DateValue;
+		endDate: DateValue;
+	}) => void;
 	onOpenCreate?: () => void;
+	showSearch?: boolean; // Nueva propiedad
 }
 
 const TopContent: React.FC<TopContentProps> = ({
@@ -19,28 +27,51 @@ const TopContent: React.FC<TopContentProps> = ({
 	totalMessage,
 	rowsPerPage,
 	onRowsPerPageChange,
+	startDate,
+	endDate,
+	onDateRangeChange,
 	onOpenCreate,
+	showSearch = true,
 }) => {
 	return (
 		<div className="flex flex-col gap-4">
-			<div className="flex justify-between gap-3 items-end">
-				<Input
-					isClearable
-					className="w-full sm:max-w-[44%]"
-					placeholder="Buscar..."
-					startContent={<FaSearch />}
-					value={filterValue}
-					onClear={onClear}
-					onValueChange={onSearchChange}
-				/>
+			<div
+				className={`flex ${showSearch ? "justify-between" : "justify-end"} gap-3 items-end`}
+			>
+				{showSearch && (
+					<Input
+						isClearable
+						className="w-full sm:max-w-[44%]"
+						placeholder="Buscar..."
+						startContent={<FaSearch />}
+						value={filterValue}
+						onClear={onClear}
+						onValueChange={onSearchChange}
+					/>
+				)}
 				<div className="flex gap-3">
-					<Button
-						color="primary"
-						endContent={<FaPlus />}
-						onClick={onOpenCreate}
-					>
-						Agregar nuevo
-					</Button>
+					{startDate !== undefined &&
+						endDate !== undefined &&
+						onDateRangeChange && (
+							<DateRangePicker
+								value={{ start: startDate, end: endDate }}
+								onChange={(range) =>
+									onDateRangeChange({
+										startDate: range.start,
+										endDate: range.end,
+									})
+								}
+							/>
+						)}
+					{onOpenCreate && (
+						<Button
+							color="primary"
+							endContent={<FaPlus />}
+							onClick={onOpenCreate}
+						>
+							Agregar nuevo
+						</Button>
+					)}
 				</div>
 			</div>
 			<div className="flex justify-between items-center">
