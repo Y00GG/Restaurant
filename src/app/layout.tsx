@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { Provider } from "./Provider";
 import "./globals.css";
 import "react-toastify/dist/ReactToastify.css";
+import { AuthProvider } from "@components/auth";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,7 +20,9 @@ export default function RootLayout({
 	return (
 		<html lang="es">
 			<body className={inter.className}>
-				<Provider>{children}</Provider>
+				<AuthProvider>
+					<Provider>{children}</Provider>
+				</AuthProvider>
 			</body>
 		</html>
 	);

@@ -1,4 +1,5 @@
 "use client";
+import { LogoutButton } from "@components/menu";
 import {
 	Navbar,
 	NavbarBrand,
@@ -84,6 +85,9 @@ const MainNavbar = () => {
 						</Link>
 					</NavbarItem>
 				))}
+				<NavbarItem>
+					<LogoutButton />
+				</NavbarItem>
 			</NavbarContent>
 
 			<NavbarContent className="md:hidden" justify="end">
@@ -104,6 +108,9 @@ const MainNavbar = () => {
 						</Link>
 					</NavbarMenuItem>
 				))}
+				<NavbarMenuItem>
+					<LogoutButton />
+				</NavbarMenuItem>
 			</NavbarMenu>
 		</Navbar>
 	);
