@@ -8,6 +8,7 @@ import {
 	DropdownTrigger,
 } from "@nextui-org/react";
 import { signOut, useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
 import { FaChevronDown } from "react-icons/fa";
 
 const LogoutButton = () => {
@@ -24,6 +25,10 @@ const LogoutButton = () => {
 		</Button>;
 	}
 
+	const handleLogout = () => {
+		signOut();
+	};
+
 	return (
 		<Dropdown placement="bottom-start">
 			<DropdownTrigger>
@@ -33,11 +38,11 @@ const LogoutButton = () => {
 					radius="sm"
 					variant="light"
 				>
-					{session?.user?.name ?? "Julián Rincón"}
+					{session?.user?.name ?? ""}
 				</Button>
 			</DropdownTrigger>
 			<DropdownMenu aria-label="User Actions" variant="flat">
-				<DropdownItem key="logout" color="danger" onClick={() => signOut()}>
+				<DropdownItem key="logout" color="danger" onClick={handleLogout}>
 					Cerrar sesión
 				</DropdownItem>
 			</DropdownMenu>

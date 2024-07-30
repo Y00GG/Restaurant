@@ -3,9 +3,21 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import type { ILoginForm } from "@interfaces/ILoginForm";
 import { Button, Input, Spacer } from "@nextui-org/react";
 import loginSchema from "@schemas/login.schema";
+import { signIn } from "next-auth/react";
+import { useState } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
+import { ToastContainer, toast } from "react-toastify";
 
 const LoginForm = () => {
+	const [isLoading, setIsLoading] = useState(false);
+
+	const notify = (message: string, status: "success" | "error") => {
+		toast(message, {
+			type: status,
+			position: "top-center",
+		});
+	};
+
 	const {
 		register,
 		handleSubmit,
@@ -15,8 +27,21 @@ const LoginForm = () => {
 		mode: "onChange",
 	});
 
-	const onSubmit: SubmitHandler<ILoginForm> = (data) => {
-		console.log(data);
+	const onSubmit: SubmitHandler<ILoginForm> = async (data) => {
+		setIsLoading(true);
+		const result = await signIn("credentials", {
+			redirect: false,
+			email: data.email,
+			password: data.password,
+		});
+
+		setIsLoading(false);
+
+		if (result?.error) {
+			notify("Usuario y/o contraseña incorrectos.", "error");
+		} else {
+			window.location.href = "/meseros";
+		}
 	};
 
 	return (
@@ -28,9 +53,9 @@ const LoginForm = () => {
 					label="Usuario"
 					id="username"
 					type="email"
-					{...register("username")}
-					isInvalid={Boolean(errors.username)}
-					errorMessage={errors.username?.message}
+					{...register("email")}
+					isInvalid={Boolean(errors.email)}
+					errorMessage={errors.email?.message}
 				/>
 			</div>
 			<div>
@@ -46,9 +71,16 @@ const LoginForm = () => {
 				/>
 			</div>
 			<Spacer y={1} />
-			<Button type="submit" color="primary" fullWidth size="lg">
+			<Button
+				type="submit"
+				color="primary"
+				fullWidth
+				size="lg"
+				isLoading={isLoading}
+			>
 				Iniciar sesión
 			</Button>
+			<ToastContainer />
 		</form>
 	);
 };

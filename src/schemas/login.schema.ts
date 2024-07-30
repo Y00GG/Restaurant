@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const loginSchema = z.object({
-	username: z
+	email: z
 		.string()
 		.min(1, "Este campo es obligatorio.")
 		.email("Debe ser un correo electrónico válido"),

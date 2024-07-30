@@ -1,46 +1,86 @@
-import NextAuth from "next-auth";
+import api from "@utils/api";
 import type { NextAuthOptions } from "next-auth";
+import NextAuth, { type DefaultSession, type DefaultUser } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+
+declare module "next-auth" {
+	interface Session {
+		user: {
+			id: string;
+			email: string;
+			accessToken: string;
+		} & DefaultSession["user"];
+	}
+
+	interface User extends DefaultUser {
+		id: string;
+		email: string;
+		accessToken: string;
+	}
+}
+
+declare module "next-auth/jwt" {
+	interface JWT {
+		id: string;
+		email: string;
+		accessToken: string;
+	}
+}
 
 export const authOptions: NextAuthOptions = {
 	providers: [
 		CredentialsProvider({
-			// The name to display on the sign in form (e.g. 'Sign in with...')
 			name: "Credentials",
-			// The credentials is used to generate a suitable form on the sign in page.
-			// You can specify whatever fields you are expecting to be submitted.
-			// e.g. domain, username, password, 2FA token, etc.
-			// You can pass any HTML attribute to the <input> tag through the object.
 			credentials: {
-				username: { label: "Username", type: "text" },
+				email: { label: "email", type: "text" },
 				password: { label: "Password", type: "password" },
 			},
 			async authorize(credentials, req) {
-				// You need to provide your own logic here that takes the credentials
-				// submitted and returns either a object representing a user or value
-				// that is false/null if the credentials are invalid.
-				// e.g. return { id: 1, name: 'J Smith', email: 'jsmith@example.com' }
-				// You can also use the `req` object to obtain additional parameters
-				// (i.e., the request IP address)
-				const res = await fetch("/your/endpoint", {
-					method: "POST",
-					body: JSON.stringify(credentials),
-					headers: { "Content-Type": "application/json" },
-				});
-				const user = await res.json();
+				try {
+					const res = await api.post<any>("auth/login/", {
+						email: credentials?.email,
+						password: credentials?.password,
+					});
 
-				// If no error and we have user data, return it
-				if (res.ok && user) {
-					return user;
+					if (res.status === 200 && res.data) {
+						const user = {
+							id: res.data.user.id,
+							email: res.data.user.email,
+							name: res.data.user.email, // Puedes asignar el nombre de usuario si está disponible
+							accessToken: res.data.token,
+						};
+						return user;
+					}
+					return null;
+				} catch (error) {
+					console.error("Error in authorization:", error);
+					return null;
 				}
-				// Return null if user data could not be retrieved
-				return null;
 			},
 		}),
 	],
 	pages: {
 		signIn: "/login",
 	},
+	callbacks: {
+		async jwt({ token, user }) {
+			if (user) {
+				token.id = user.id;
+				token.email = user.email;
+				token.accessToken = user.accessToken;
+			}
+			return token;
+		},
+		async session({ session, token }) {
+			if (session.user) {
+				session.user.id = token.id as string;
+				session.user.email = token.email as string;
+				session.user.accessToken = token.accessToken as string;
+			}
+			return session;
+		},
+	},
+	secret: process.env.JWT_SECRET,
 };
 
 const handler = NextAuth(authOptions);

@@ -4,12 +4,15 @@ import { CreateWaiterModal, EditWaiterModal } from "@components/waiter";
 import type { IColumn } from "@interfaces/ITableState";
 import type { IWaiter } from "@interfaces/IWaiter";
 import { Button, useDisclosure } from "@nextui-org/react";
-import { useState } from "react";
+import { useWaiterStore } from "@store/waiter.store";
+import { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { waiters } from "./data";
 
 const Waiter = () => {
+	const { getWaiters } = useWaiterStore();
+
 	const {
 		isOpen: isOpenEdit,
 		onOpen: onOpenEdit,
@@ -72,6 +75,10 @@ const Waiter = () => {
 			),
 		},
 	];
+
+	useEffect(() => {
+		getWaiters();
+	}, [getWaiters]);
 
 	return (
 		<div className="flex justify-center items-center">
