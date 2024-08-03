@@ -40,6 +40,7 @@ const LoginForm = () => {
 		if (result?.error) {
 			notify("Usuario y/o contraseña incorrectos.", "error");
 		} else {
+			console.log("Entrando")
 			window.location.href = "/meseros";
 		}
 	};

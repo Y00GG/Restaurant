@@ -1,9 +1,9 @@
 import { z } from "zod";
 
 const menuSchema = z.object({
-	name: z.string().min(1, "Este campo es obligatorio."),
-	ingredients: z.array(z.string()).min(1, "Este campo es obligatorio."),
-	price: z.number(),
+  nombre: z.string().min(1, "El nombre es obligatorio"),
+  ingredientes: z.array(z.string()).min(1, "Debe tener al menos un ingrediente"),
+  precio: z.number().positive("El precio debe ser un número positivo"),
 });
 
 export default menuSchema;

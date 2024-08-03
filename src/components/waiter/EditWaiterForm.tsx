@@ -4,6 +4,8 @@ import { Button, Input, Spacer } from "@nextui-org/react";
 import waiterSchema from "@schemas/waiter.schema";
 import type { FC } from "react";
 import { useForm } from "react-hook-form";
+import { useWaiterStore } from "@store/waiter.store"; // Import the store
+
 
 interface Props {
 	onClose: () => void;
@@ -11,17 +13,34 @@ interface Props {
 }
 
 const EditWaiterForm: FC<Props> = ({ onClose, waiter }) => {
+	const { updateWaiter } = useWaiterStore(); // Get the update function from the store
+
+	// Map the waiter properties to IWaiterForm
+	const mapWaiterToForm = (waiter: IWaiter): IWaiterForm => ({
+		nombre: waiter.nombre,
+		apellido: waiter.apellido,
+		numeroIdentidad: waiter.numeroIdentidad,
+		telefono: waiter.telefono,
+		email: waiter.email,
+		password: waiter.password, // Handle this appropriately, maybe only input on edit
+	});
+
 	const {
 		register,
 		handleSubmit,
 		formState: { errors },
 	} = useForm<IWaiterForm>({
-		defaultValues: { ...waiter },
+		defaultValues: mapWaiterToForm(waiter),
 		resolver: zodResolver(waiterSchema),
 	});
 
-	const onSubmit = (data: IWaiterForm) => {
-		console.log(data);
+	const onSubmit = async (data: IWaiterForm) => {
+		try {
+			await updateWaiter({ ...waiter, ...data }); // Update the waiter with the new data
+			onClose(); // Close the form on success
+		} catch (error) {
+			console.error("Error updating waiter:", error);
+		}
 	};
 
 	return (
@@ -35,39 +54,39 @@ const EditWaiterForm: FC<Props> = ({ onClose, waiter }) => {
 		>
 			<Input
 				label="Nombres"
-				{...register("name")}
-				isInvalid={Boolean(errors.name)}
-				errorMessage={errors.name?.message}
+				{...register("nombre")}
+				isInvalid={Boolean(errors.nombre)}
+				errorMessage={errors.nombre?.message}
 				fullWidth
 			/>
 			<Input
 				label="Apellidos"
-				{...register("lastName")}
-				isInvalid={Boolean(errors.lastName)}
-				errorMessage={errors.lastName?.message}
+				{...register("apellido")}
+				isInvalid={Boolean(errors.apellido)}
+				errorMessage={errors.apellido?.message}
 				fullWidth
 			/>
 			<Input
-				label="No. CC"
+				label="No. Identidad"
 				type="number"
-				{...register("cc")}
-				isInvalid={Boolean(errors.cc)}
-				errorMessage={errors.cc?.message}
+				{...register("numeroIdentidad")}
+				isInvalid={Boolean(errors.numeroIdentidad)}
+				errorMessage={errors.numeroIdentidad?.message}
 				fullWidth
 			/>
 			<Input
 				label="Teléfono"
 				type="number"
-				{...register("phone")}
-				isInvalid={Boolean(errors.phone)}
-				errorMessage={errors.phone?.message}
+				{...register("telefono")}
+				isInvalid={Boolean(errors.telefono)}
+				errorMessage={errors.telefono?.message}
 				fullWidth
 			/>
 			<Input
-				label="Usuario"
-				{...register("username")}
-				isInvalid={Boolean(errors.username)}
-				errorMessage={errors.username?.message}
+				label="Correo Electrónico"
+				{...register("email")}
+				isInvalid={Boolean(errors.email)}
+				errorMessage={errors.email?.message}
 				fullWidth
 			/>
 			<Input
@@ -79,7 +98,7 @@ const EditWaiterForm: FC<Props> = ({ onClose, waiter }) => {
 				fullWidth
 			/>
 			<div style={{ display: "flex", justifyContent: "space-between" }}>
-				<Button type="submit" color="success" onClick={onClose}>
+				<Button type="submit" color="success">
 					Editar
 				</Button>
 				<Spacer x={0.5} />

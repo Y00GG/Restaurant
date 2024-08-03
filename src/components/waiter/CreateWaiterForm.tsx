@@ -4,12 +4,15 @@ import { Button, Input, Spacer } from "@nextui-org/react";
 import waiterSchema from "@schemas/waiter.schema";
 import type { FC } from "react";
 import { useForm } from "react-hook-form";
+import { useWaiterStore } from "@store/waiter.store";
 
 interface Props {
 	onClose: () => void;
 }
 
 const CreateWaiterForm: FC<Props> = ({ onClose }) => {
+	const { createWaiter } = useWaiterStore();
+
 	const {
 		register,
 		handleSubmit,
@@ -18,8 +21,13 @@ const CreateWaiterForm: FC<Props> = ({ onClose }) => {
 		resolver: zodResolver(waiterSchema),
 	});
 
-	const onSubmit = (data: IWaiterForm) => {
-		console.log(data);
+	const onSubmit = async (data: IWaiterForm) => {
+		try {
+			await createWaiter(data);
+			onClose(); 
+		} catch (error) {
+			console.error("Error creating waiter:", error);
+		}
 	};
 
 	return (
@@ -33,39 +41,39 @@ const CreateWaiterForm: FC<Props> = ({ onClose }) => {
 		>
 			<Input
 				label="Nombres"
-				{...register("name")}
-				isInvalid={Boolean(errors.name)}
-				errorMessage={errors.name?.message}
+				{...register("nombre")}
+				isInvalid={Boolean(errors.nombre)}
+				errorMessage={errors.nombre?.message}
 				fullWidth
 			/>
 			<Input
 				label="Apellidos"
-				{...register("lastName")}
-				isInvalid={Boolean(errors.lastName)}
-				errorMessage={errors.lastName?.message}
+				{...register("apellido")}
+				isInvalid={Boolean(errors.apellido)}
+				errorMessage={errors.apellido?.message}
 				fullWidth
 			/>
 			<Input
-				label="No. CC"
+				label="No. Identidad"
 				type="number"
-				{...register("cc")}
-				isInvalid={Boolean(errors.cc)}
-				errorMessage={errors.cc?.message}
+				{...register("numeroIdentidad")}
+				isInvalid={Boolean(errors.numeroIdentidad)}
+				errorMessage={errors.numeroIdentidad?.message}
 				fullWidth
 			/>
 			<Input
 				label="Teléfono"
 				type="number"
-				{...register("phone")}
-				isInvalid={Boolean(errors.phone)}
-				errorMessage={errors.phone?.message}
+				{...register("telefono")}
+				isInvalid={Boolean(errors.telefono)}
+				errorMessage={errors.telefono?.message}
 				fullWidth
 			/>
 			<Input
-				label="Usuario"
-				{...register("username")}
-				isInvalid={Boolean(errors.username)}
-				errorMessage={errors.username?.message}
+				label="Correo Electrónico"
+				{...register("email")}
+				isInvalid={Boolean(errors.email)}
+				errorMessage={errors.email?.message}
 				fullWidth
 			/>
 			<Input
@@ -77,7 +85,7 @@ const CreateWaiterForm: FC<Props> = ({ onClose }) => {
 				fullWidth
 			/>
 			<div style={{ display: "flex", justifyContent: "space-between" }}>
-				<Button type="submit" color="success" onClick={onClose}>
+				<Button type="submit" color="success">
 					Crear
 				</Button>
 				<Spacer x={0.5} />
